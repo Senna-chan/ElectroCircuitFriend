@@ -21,11 +21,11 @@ namespace ElectroCircuitFriend.Models
     {
         public int Id { get; set; }
         public double Capacity { get; set; }
-        public virtual Volt Voltage { get; set; }
-        public virtual Amp MaxAmpDraw { get; set; }
+        public string Voltage { get; set; }
+        public string MaxAmpDraw { get; set; }
         public BatteryTypes BatteryType { get; set; }
 
-        public Battery(int capacity, Volt voltage, Amp maxAmpDraw, BatteryTypes batteryType)
+        public Battery(int capacity, string voltage, string maxAmpDraw, BatteryTypes batteryType)
         {
             Capacity = capacity;
             Voltage = voltage;

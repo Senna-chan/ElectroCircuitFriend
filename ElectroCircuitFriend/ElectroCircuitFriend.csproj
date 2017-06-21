@@ -72,6 +72,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Properties\Annotations.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -89,25 +90,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\201612212023384_Initial.cs" />
-    <Compile Include="Migrations\201612212023384_Initial.Designer.cs">
-      <DependentUpon>201612212023384_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201612221605303_FixedThings.cs" />
-    <Compile Include="Migrations\201612221605303_FixedThings.Designer.cs">
-      <DependentUpon>201612221605303_FixedThings.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\Amp.cs" />
     <Compile Include="Models\Battery.cs" />
     <Compile Include="Models\Capacitor.cs" />
     <Compile Include="Models\Component.cs" />
-    <Compile Include="Models\Driver.cs" />
-    <Compile Include="Models\Frequency.cs" />
-    <Compile Include="Models\MicroController.cs" />
     <Compile Include="Models\Resistor.cs" />
     <Compile Include="Models\Transistor.cs" />
-    <Compile Include="Models\Volt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -121,12 +109,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Migrations\201612212023384_Initial.resx">
-      <DependentUpon>201612212023384_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612221605303_FixedThings.resx">
-      <DependentUpon>201612221605303_FixedThings.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -142,7 +124,19 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assets\ComponentAssets\" />
     <Folder Include="Views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Resistor_3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Resistor_4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Resistor_5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

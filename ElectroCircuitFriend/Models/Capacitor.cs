@@ -14,9 +14,9 @@
         public int Id { get; set; }
         public double Value { get; set; }
         public FaradValueNames FaradValue { get; set; }
-        public Volt MaxVolt { get; set; }
+        public string MaxVolt { get; set; }
 
-        public Capacitor(double value, FaradValueNames faradValue, Volt maxVolt)
+        public Capacitor(double value, FaradValueNames faradValue, string maxVolt)
         {
             Value = value;
             FaradValue = faradValue;

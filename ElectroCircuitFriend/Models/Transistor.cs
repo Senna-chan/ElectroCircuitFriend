@@ -18,14 +18,15 @@ namespace ElectroCircuitFriend.Models
     {
         public int Id { get; set; }
         public TransistorTypes TransistorType{ get; set; }
-        public Volt MinVolt { get; set; }
-        public Volt MaxVolt { get; set; }
-
-        public Transistor(TransistorTypes transistorType, Volt minVolt, Volt maxVolt)
+        public string MinVolt { get; set; }
+        public string MaxVolt { get; set; }
+        public string MaxAmp { get; set; }
+        public Transistor(TransistorTypes transistorType, string minVolt, string maxVolt, string maxAmp)
         {
             TransistorType = transistorType;
             MinVolt = minVolt;
             MaxVolt = maxVolt;
+            MaxAmp = maxAmp;
         }
     }
 }

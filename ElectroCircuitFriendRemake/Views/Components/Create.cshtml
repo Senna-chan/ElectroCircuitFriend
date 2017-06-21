@@ -1,0 +1,100 @@
+@model ElectroCircuitFriendRemake.ViewModels.CreateComponentViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<form asp-action="Create" enctype="multipart/form-data" id="CreateComponent">
+    <div class="form-horizontal" enc>
+        <h4>Component</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="ComponentCategory" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="ComponentCategory" class="form-control"></select>
+                <span asp-validation-for="ComponentCategory" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Name" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ExtraDescription" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="ExtraDescription" class="form-control" />
+                <span asp-validation-for="ExtraDescription" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ComponentImage" class="col-md-2 control-label"></label>
+            <div class="col-md-5">
+                <input asp-for="ComponentImage" class="form-control form-control-text-file" />
+                <label class="btn btn-default btn-file">
+                    Browse<input asp-for="ComponentImageFile" class="form-control" />
+                </label>
+                <span asp-validation-for="ComponentImage" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ComponentPinoutImage" class="col-md-2 control-label"></label>
+            <div class="col-md-5">
+                <input asp-for="ComponentPinoutImage" class="form-control form-control-text-file" />
+                <span class="btn btn-default btn-file">
+                    Browse<input asp-for="ComponentPinoutImageFile" class="form-control" />
+                </span>
+                <span asp-validation-for="ComponentPinoutImage" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="DataSheet" class="col-md-2 control-label"></label>
+            <div class="col-md-5">
+                <input asp-for="DataSheet" class="form-control form-control-text-file" />
+                <label class="btn btn-default btn-file">
+                    Browse<input asp-for="DatasheetFile" class="form-control" />
+                </label>
+                <span asp-validation-for="DataSheet" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="InStock" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="InStock" class="form-control" />
+                <span asp-validation-for="InStock" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Used" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Used" class="form-control" />
+                <span asp-validation-for="Used" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

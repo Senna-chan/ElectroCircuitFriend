@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectroCircuitFriend", "ElectroCircuitFriend\ElectroCircuitFriend.csproj", "{C461F85B-D4A5-4C48-925B-FEEF77D456FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectroCircuitFriendRemake", "ElectroCircuitFriendRemake\ElectroCircuitFriendRemake.csproj", "{C8EF3325-919F-4512-9FBB-B77E76E9ECC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{C461F85B-D4A5-4C48-925B-FEEF77D456FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C461F85B-D4A5-4C48-925B-FEEF77D456FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C461F85B-D4A5-4C48-925B-FEEF77D456FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8EF3325-919F-4512-9FBB-B77E76E9ECC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8EF3325-919F-4512-9FBB-B77E76E9ECC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8EF3325-919F-4512-9FBB-B77E76E9ECC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8EF3325-919F-4512-9FBB-B77E76E9ECC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

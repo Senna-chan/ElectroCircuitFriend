@@ -2,7 +2,7 @@
 
 namespace ElectroCircuitFriend.Models
 {
-    enum ResistorColors
+    public enum ResistorColors
     {
         Black,
         Brown,
@@ -18,7 +18,7 @@ namespace ElectroCircuitFriend.Models
         Silver
     }
 
-    enum ResistorMultiplier
+    public enum ResistorMultiplier
     {
         X0,
         X10,
@@ -34,7 +34,7 @@ namespace ElectroCircuitFriend.Models
         X001
     }
 
-    enum ResistorTolerance
+    public enum ResistorTolerance
     {
         T1 = 1,
         T2 = 2,
@@ -59,9 +59,6 @@ namespace ElectroCircuitFriend.Models
         public bool Use5Bands { get; set; }
         public int Amount { get; set; }
 
-
-        internal Resistor() { }
-
         public Resistor(int band1, int band2, int band3, int? band4, int? band5, int amount)
         {
             Band1 = band1;
@@ -76,9 +73,9 @@ namespace ElectroCircuitFriend.Models
             }
             if (band5 != null)
             {
-                Use4Bands = true;
                 Use5Bands = true;
             }
+
         }
 
     }
