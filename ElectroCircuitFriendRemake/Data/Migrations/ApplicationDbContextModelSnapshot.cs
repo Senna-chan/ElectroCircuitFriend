@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using ElectroCircuitFriendRemake.Data;
-using ElectroCircuitFriendRemake.Models;
 
 namespace ElectroCircuitFriendRemake.Data.Migrations
 {

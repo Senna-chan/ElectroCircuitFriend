@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,15 +10,17 @@ using Microsoft.EntityFrameworkCore;
 using ElectroCircuitFriendRemake.Data;
 using ElectroCircuitFriendRemake.Models;
 using ElectroCircuitFriendRemake.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ElectroCircuitFriendRemake.Controllers
 {
     public class ComponentsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public ComponentsController(ApplicationDbContext context)
+        private IHostingEnvironment _hostingEnvironment;
+        public ComponentsController(ApplicationDbContext context, IHostingEnvironment environment)
         {
+            _hostingEnvironment = environment;
             _context = context;    
         }
 
@@ -63,8 +67,89 @@ namespace ElectroCircuitFriendRemake.Controllers
 
                 var component = new Component
                 {
-
+                    Name = model.Name,
+                    Description = model.Description,
+                    ExtraDescription = model.ExtraDescription,
+                    InStock = model.InStock,
+                    Used = model.Used
                 };
+                var uploads = Path.Combine(_hostingEnvironment.ContentRootPath, "uploads");
+                if (model.DataSheet != string.Empty)
+                {
+                    if (model.DataSheet.StartsWith("http"))
+                    {
+                        using (var httpClient = new HttpClient())
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                var downloadStream = await httpClient.GetStreamAsync(new Uri(model.DataSheet));
+                                downloadStream.CopyTo(ms);
+                                component.DataSheet = Convert.ToBase64String(ms.ToArray());
+                            }
+                        }
+                    }
+                    else if(model.DatasheetFile != null)
+                    {
+                        await model.DatasheetFile.CopyToAsync(System.IO.File.Create(Path.Combine(uploads, model.Name + "-datasheet")));
+                    }
+                }
+
+                if (model.ComponentImage != string.Empty)
+                {
+                    if (model.ComponentImage.StartsWith("http"))
+                    {
+                        using (var httpClient = new HttpClient())
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentImage));
+                                downloadStream.CopyTo(ms);
+                                component.ComponentImage = Convert.ToBase64String(ms.ToArray());
+                            }
+                        }
+                    }
+                    else if(model.ComponentImageFile != null)
+                    {
+                        using (var fileStream = model.ComponentImageFile.OpenReadStream())
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                fileStream.CopyTo(ms);
+                                component.ComponentImage = Convert.ToBase64String(ms.ToArray());
+                            }
+                        }
+                    }
+                }
+
+                if (model.ComponentPinoutImage != string.Empty)
+                {
+                    if (model.ComponentPinoutImage.StartsWith("http"))
+                    {
+                        using (var httpClient = new HttpClient())
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentPinoutImage));
+                                downloadStream.CopyTo(ms);
+                                component.ComponentPinoutImage = Convert.ToBase64String(ms.ToArray());
+                            }
+                        }
+                    }
+                    else if(model.ComponentPinoutImageFile != null)
+                    {
+                        using (var fileStream = model.ComponentPinoutImageFile.OpenReadStream())
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                fileStream.CopyTo(ms);
+                                component.ComponentPinoutImage = Convert.ToBase64String(ms.ToArray());
+                            }
+                        }
+                    }
+                }
+                
+
+
                 _context.Add(component);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");

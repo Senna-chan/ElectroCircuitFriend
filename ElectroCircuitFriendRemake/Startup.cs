@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ElectroCircuitFriendRemake.Data;
@@ -35,7 +36,6 @@ namespace ElectroCircuitFriendRemake
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
             // Add framework services.
             services.AddMvc();
             if (IsDevelopment)

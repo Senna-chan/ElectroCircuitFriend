@@ -49,19 +49,19 @@ namespace ElectroCircuitFriendRemake.ViewModels
                    "Components used cannot be higher then Components owned",
                     new[] { "InStock", "Used" });
             }
-            if (DatasheetFile != null && DataSheet != DatasheetFile.Name)
+            if (DatasheetFile != null && DataSheet != DatasheetFile.FileName)
             {
                 yield return new ValidationResult(
                     "Text input is not the same as the file upload.</br>Did you wanted to change it to something else?",
                     new[] {"DataSheet"});
             }
-            if (ComponentImageFile != null && ComponentImage != ComponentImageFile.Name)
+            if (ComponentImageFile != null && ComponentImage != ComponentImageFile.FileName)
             {
                 yield return new ValidationResult(
                     "Text input is not the same as the file upload.</br>Did you wanted to change it to something else?",
                     new[] {"ComponentImage"});
             }
-            if (ComponentPinoutImageFile != null && ComponentPinoutImage != ComponentPinoutImageFile.Name)
+            if (ComponentPinoutImageFile != null && ComponentPinoutImage != ComponentPinoutImageFile.FileName)
             {
                 yield return new ValidationResult(
                     "Text input is not the same as the file upload.</br>Did you wanted to change it to something else?",
