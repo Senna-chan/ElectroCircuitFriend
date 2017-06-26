@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace ElectroCircuitFriendRemake.Data.Migrations
+namespace ElectroCircuitFriendRemake.Migrations
 {
     public partial class Initial : Migration
     {
@@ -85,13 +85,14 @@ namespace ElectroCircuitFriendRemake.Data.Migrations
                     BatteryId = table.Column<int>(nullable: true),
                     CapacitorId = table.Column<int>(nullable: true),
                     ComponentCategory = table.Column<int>(nullable: false),
-                    ComponentImage = table.Column<string>(nullable: true),
-                    ComponentPinoutImage = table.Column<string>(nullable: true),
-                    DataSheet = table.Column<string>(nullable: true),
+                    ComponentImage = table.Column<bool>(nullable: false),
+                    ComponentPinoutImage = table.Column<bool>(nullable: false),
+                    DataSheet = table.Column<bool>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     ExtraDescription = table.Column<string>(nullable: true),
                     InStock = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true),
+                    NormalizedString = table.Column<string>(nullable: true),
                     ResistorId = table.Column<int>(nullable: true),
                     TransistorId = table.Column<int>(nullable: true),
                     Used = table.Column<int>(nullable: false)

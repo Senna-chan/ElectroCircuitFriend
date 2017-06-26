@@ -1,16 +1,17 @@
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using ElectroCircuitFriendRemake.Data;
 using ElectroCircuitFriendRemake.Models;
 using ElectroCircuitFriendRemake.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ElectroCircuitFriendRemake.Controllers
 {
@@ -64,86 +65,90 @@ namespace ElectroCircuitFriendRemake.Controllers
         {
             if (ModelState.IsValid)
             {
-
+                var componentSaveName = Regex.Replace(model.Name, @"\s+", "");
                 var component = new Component
                 {
                     Name = model.Name,
                     Description = model.Description,
                     ExtraDescription = model.ExtraDescription,
                     InStock = model.InStock,
-                    Used = model.Used
+                    Used = model.Used,
+                    NormalizedString = componentSaveName
                 };
-                var uploads = Path.Combine(_hostingEnvironment.ContentRootPath, "uploads");
+                var uploads = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
+                
                 if (model.DataSheet != string.Empty)
                 {
+                    var path = Path.Combine(uploads, componentSaveName + "-datasheet.pdf");
+                    //component.DataSheet = true;
                     if (model.DataSheet.StartsWith("http"))
                     {
                         using (var httpClient = new HttpClient())
                         {
-                            using (var ms = new MemoryStream())
+                            using (var fileStream = new FileStream(path, FileMode.Create))
                             {
                                 var downloadStream = await httpClient.GetStreamAsync(new Uri(model.DataSheet));
-                                downloadStream.CopyTo(ms);
-                                component.DataSheet = Convert.ToBase64String(ms.ToArray());
+                                downloadStream.CopyTo(fileStream);
                             }
                         }
                     }
-                    else if(model.DatasheetFile != null)
+                    else if (model.DatasheetFile != null)
                     {
-                        await model.DatasheetFile.CopyToAsync(System.IO.File.Create(Path.Combine(uploads, model.Name + "-datasheet")));
+                        using (var fileStream = new FileStream(path, FileMode.Create))
+                        {
+                            await model.DatasheetFile.CopyToAsync(fileStream);
+                        }
                     }
                 }
 
-                if (model.ComponentImage != string.Empty)
+                if (model.ComponentImage != null)
                 {
+                    string path;
+                    //component.ComponentImage = true;
                     if (model.ComponentImage.StartsWith("http"))
                     {
+                        path = Path.Combine(uploads, componentSaveName + Path.GetExtension(await GetFileNameFromUrl(model.ComponentImage)));
                         using (var httpClient = new HttpClient())
                         {
-                            using (var ms = new MemoryStream())
+                            using (var fileStream = new FileStream(path, FileMode.Create))
                             {
                                 var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentImage));
-                                downloadStream.CopyTo(ms);
-                                component.ComponentImage = Convert.ToBase64String(ms.ToArray());
+                                downloadStream.CopyTo(fileStream);
                             }
                         }
                     }
-                    else if(model.ComponentImageFile != null)
+                    else if (model.ComponentImageFile != null)
                     {
-                        using (var fileStream = model.ComponentImageFile.OpenReadStream())
+                        path = Path.Combine(uploads, componentSaveName + Path.GetExtension(model.ComponentImage));
+                        using (var fileStream = new FileStream(path, FileMode.Create))
                         {
-                            using (var ms = new MemoryStream())
-                            {
-                                fileStream.CopyTo(ms);
-                                component.ComponentImage = Convert.ToBase64String(ms.ToArray());
-                            }
+                            await model.ComponentImageFile.CopyToAsync(fileStream);
                         }
                     }
                 }
 
                 if (model.ComponentPinoutImage != string.Empty)
                 {
+                    string path;
+                    //component.ComponentPinoutImage = true;
                     if (model.ComponentPinoutImage.StartsWith("http"))
                     {
+                        path = Path.Combine(uploads, componentSaveName + Path.GetExtension(await GetFileNameFromUrl(model.ComponentPinoutImage)));
                         using (var httpClient = new HttpClient())
                         {
-                            using (var ms = new MemoryStream())
+                            using (var fileStream = new FileStream(path, FileMode.Create))
                             {
                                 var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentPinoutImage));
-                                downloadStream.CopyTo(ms);
-                                component.ComponentPinoutImage = Convert.ToBase64String(ms.ToArray());
+                                downloadStream.CopyTo(fileStream);
                             }
                         }
                     }
-                    else if(model.ComponentPinoutImageFile != null)
+                    else if (model.ComponentPinoutImageFile != null)
                     {
-                        using (var fileStream = model.ComponentPinoutImageFile.OpenReadStream())
+                        path = Path.Combine(uploads, componentSaveName + Path.GetExtension(model.ComponentPinoutImage));
+                        using (var fileStream = new FileStream(path, FileMode.Create))
                         {
-                            using (var ms = new MemoryStream())
-                            {
-                                fileStream.CopyTo(ms);
-                                component.ComponentPinoutImage = Convert.ToBase64String(ms.ToArray());
-                            }
+                            await model.ComponentPinoutImageFile.CopyToAsync(fileStream);
                         }
                     }
                 }
@@ -155,6 +160,28 @@ namespace ElectroCircuitFriendRemake.Controllers
                 return RedirectToAction("Index");
             }
             return View(model);
+        }
+
+
+        private async Task<string> GetFileNameFromUrl(string url)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            string fileName = "";
+            try
+            {
+                HttpWebResponse res = (HttpWebResponse)await request.GetResponseAsync();
+                using (Stream rstream = res.GetResponseStream())
+                {
+                    fileName = res.Headers["Content-Disposition"] != null ?
+                        res.Headers["Content-Disposition"].Replace("attachment; filename=", "").Replace("\"", "") :
+                        res.Headers["Location"] != null ? Path.GetFileName(res.Headers["Location"]) :
+                            Path.GetFileName(url).Contains('?') || Path.GetFileName(url).Contains('=') ?
+                                Path.GetFileName(res.ResponseUri.ToString()) : "";
+                }
+                res.Dispose();
+            }
+            catch { }
+            return fileName;
         }
 
         // GET: Components/Edit/5

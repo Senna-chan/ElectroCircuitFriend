@@ -28,6 +28,7 @@ namespace ElectroCircuitFriendRemake.Models
         public int Id { get; set; }
         public ComponentCategories ComponentCategory { get; set; }
         public string Name { get; set; }
+        public string NormalizedString { get; set; }
         public string Description { get; set; }
         public string ExtraDescription { get; set; }
         public string ComponentImage { get; set; }

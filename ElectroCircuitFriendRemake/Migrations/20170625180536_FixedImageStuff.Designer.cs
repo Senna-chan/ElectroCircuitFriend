@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using ElectroCircuitFriendRemake.Data;
 using ElectroCircuitFriendRemake.Models;
 
-namespace ElectroCircuitFriendRemake.Data.Migrations
+namespace ElectroCircuitFriendRemake.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170621092304_Initial")]
-    partial class Initial
+    [Migration("20170625180536_FixedImageStuff")]
+    partial class FixedImageStuff
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -76,6 +76,8 @@ namespace ElectroCircuitFriendRemake.Data.Migrations
                     b.Property<int>("InStock");
 
                     b.Property<string>("Name");
+
+                    b.Property<string>("NormalizedString");
 
                     b.Property<int?>("ResistorId");
 

@@ -4,13 +4,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using ElectroCircuitFriendRemake.Data;
+using ElectroCircuitFriendRemake.Models;
 
-namespace ElectroCircuitFriendRemake.Data.Migrations
+namespace ElectroCircuitFriendRemake.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170624193606_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")
@@ -61,11 +63,11 @@ namespace ElectroCircuitFriendRemake.Data.Migrations
 
                     b.Property<int>("ComponentCategory");
 
-                    b.Property<string>("ComponentImage");
+                    b.Property<bool>("ComponentImage");
 
-                    b.Property<string>("ComponentPinoutImage");
+                    b.Property<bool>("ComponentPinoutImage");
 
-                    b.Property<string>("DataSheet");
+                    b.Property<bool>("DataSheet");
 
                     b.Property<string>("Description");
 
@@ -74,6 +76,8 @@ namespace ElectroCircuitFriendRemake.Data.Migrations
                     b.Property<int>("InStock");
 
                     b.Property<string>("Name");
+
+                    b.Property<string>("NormalizedString");
 
                     b.Property<int?>("ResistorId");
 
