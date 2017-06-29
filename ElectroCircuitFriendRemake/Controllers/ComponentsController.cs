@@ -7,28 +7,33 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ElectroCircuitFriendRemake.Data;
+using ElectroCircuitFriendRemake.Helpers;
 using ElectroCircuitFriendRemake.Models;
 using ElectroCircuitFriendRemake.ViewModels;
+using ImageSharp;
+using ImageSharp.Processing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using SixLabors.Primitives;
 
 namespace ElectroCircuitFriendRemake.Controllers
 {
     public class ComponentsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _dbContext;
         private IHostingEnvironment _hostingEnvironment;
-        public ComponentsController(ApplicationDbContext context, IHostingEnvironment environment)
+        public ComponentsController(ApplicationDbContext dbContext, IHostingEnvironment environment)
         {
             _hostingEnvironment = environment;
-            _context = context;    
+            _dbContext = dbContext;    
         }
 
         // GET: Components
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Components.ToListAsync());
+            return View(await _dbContext.Components.ToListAsync());
         }
 
         // GET: Components/Details/5
@@ -39,7 +44,7 @@ namespace ElectroCircuitFriendRemake.Controllers
                 return NotFound();
             }
 
-            var component = await _context.Components
+            var component = await _dbContext.Components
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (component == null)
             {
@@ -54,6 +59,29 @@ namespace ElectroCircuitFriendRemake.Controllers
         {
             var viewModel = new CreateComponentViewModel();
             return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<string> ChangeItem([FromBody]ChangeItemAmountViewModel model)
+        {
+            var component = await _dbContext.Components.FirstOrDefaultAsync(c => c.Id == int.Parse(model.ItemId));
+            if (model.Itemtype == "instock")
+            {
+                if(model.ChangeAction == "add")         component.InStock++;
+                if (model.ChangeAction == "subtract")   component.InStock--;
+                _dbContext.Update(component);
+                await _dbContext.SaveChangesAsync();
+                return component.InStock.ToString();
+            }
+            if (model.Itemtype == "used")
+            {
+                if (model.ChangeAction == "add") component.Used++;
+                if (model.ChangeAction == "subtract") component.Used--;
+                _dbContext.Update(component);
+                await _dbContext.SaveChangesAsync();
+                return component.Used.ToString();
+            }
+            return "";
         }
 
         // POST: Components/Create
@@ -80,9 +108,13 @@ namespace ElectroCircuitFriendRemake.Controllers
                 if (model.DataSheet != string.Empty)
                 {
                     var path = Path.Combine(uploads, componentSaveName + "-datasheet.pdf");
-                    //component.DataSheet = true;
+                    component.DataSheet = componentSaveName + "-datasheet.pdf";
                     if (model.DataSheet.StartsWith("http"))
                     {
+                        if (model.DataSheet.Contains("www.google."))
+                        {
+                            model.DataSheet = model.DataSheet.GetQueryParam("url");
+                        }
                         using (var httpClient = new HttpClient())
                         {
                             using (var fileStream = new FileStream(path, FileMode.Create))
@@ -103,26 +135,46 @@ namespace ElectroCircuitFriendRemake.Controllers
 
                 if (model.ComponentImage != null)
                 {
+                    string extension;
                     string path;
-                    //component.ComponentImage = true;
                     if (model.ComponentImage.StartsWith("http"))
                     {
-                        path = Path.Combine(uploads, componentSaveName + Path.GetExtension(await GetFileNameFromUrl(model.ComponentImage)));
+                        extension = Path.GetExtension(await GetFileNameFromUrl(model.ComponentImage));
+                        component.ComponentImage = componentSaveName + extension;
+                        path = Path.Combine(uploads, component.ComponentImage);
                         using (var httpClient = new HttpClient())
                         {
-                            using (var fileStream = new FileStream(path, FileMode.Create))
+                            if (model.ComponentPinoutImage.Contains("www.google."))
+                            {
+                                model.ComponentPinoutImage = model.ComponentPinoutImage.GetQueryParam("url");
+                            }
+                            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
                             {
                                 var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentImage));
                                 downloadStream.CopyTo(fileStream);
+                                using (var thumbnailFileStream = new FileStream(Path.Combine(uploads,componentSaveName + "-254x254" + extension), FileMode.Create))
+                                {
+                                    Image<Rgba32> image = Image.Load<Rgba32>(fileStream);
+                                    image.Resize(new ResizeOptions{Mode = ResizeMode.Max, Size = new Size(254, 254) }).Save(thumbnailFileStream);
+                                    image.Dispose();
+                                }
                             }
                         }
                     }
                     else if (model.ComponentImageFile != null)
                     {
-                        path = Path.Combine(uploads, componentSaveName + Path.GetExtension(model.ComponentImage));
-                        using (var fileStream = new FileStream(path, FileMode.Create))
+                        extension = Path.GetExtension(model.ComponentImage);
+                        component.ComponentImage = componentSaveName + extension;
+                        path = Path.Combine(uploads, component.ComponentImage);
+                        using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
                         {
                             await model.ComponentImageFile.CopyToAsync(fileStream);
+                            using (var thumbnailFileStream = new FileStream(Path.Combine(uploads, componentSaveName + "-254x254" + extension), FileMode.Create))
+                            {
+                                Image<Rgba32> image = Image.Load<Rgba32>(fileStream);
+                                image.Resize(new ResizeOptions { Mode = ResizeMode.Max, Size = new Size(254, 254) }).Save(thumbnailFileStream);
+                                image.Dispose();
+                            }
                         }
                     }
                 }
@@ -130,33 +182,53 @@ namespace ElectroCircuitFriendRemake.Controllers
                 if (model.ComponentPinoutImage != string.Empty)
                 {
                     string path;
-                    //component.ComponentPinoutImage = true;
+                    string extension;
                     if (model.ComponentPinoutImage.StartsWith("http"))
                     {
-                        path = Path.Combine(uploads, componentSaveName + Path.GetExtension(await GetFileNameFromUrl(model.ComponentPinoutImage)));
+                        if (model.ComponentPinoutImage.Contains("www.google."))
+                        {
+                            model.ComponentPinoutImage = model.ComponentPinoutImage.GetQueryParam("imgurl");
+                        }
+                        extension = Path.GetExtension(await GetFileNameFromUrl(model.ComponentPinoutImage));
+                        component.ComponentPinoutImage = componentSaveName + extension;
+                        path = Path.Combine(uploads, component.ComponentPinoutImage);
                         using (var httpClient = new HttpClient())
                         {
-                            using (var fileStream = new FileStream(path, FileMode.Create))
+                            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
                             {
                                 var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentPinoutImage));
-                                downloadStream.CopyTo(fileStream);
+                                await downloadStream.CopyToAsync(fileStream);
+                                using (var thumbnailFileStream = new FileStream(Path.Combine(uploads, componentSaveName + "-254x254" + extension), FileMode.Create))
+                                {
+                                    Image<Rgba32> image = Image.Load<Rgba32>(fileStream);
+                                    image.Resize(new ResizeOptions { Mode = ResizeMode.Max, Size = new Size(254, 254) }).Save(thumbnailFileStream);
+                                    image.Dispose();
+                                }
                             }
                         }
                     }
                     else if (model.ComponentPinoutImageFile != null)
                     {
-                        path = Path.Combine(uploads, componentSaveName + Path.GetExtension(model.ComponentPinoutImage));
-                        using (var fileStream = new FileStream(path, FileMode.Create))
+                        extension = Path.GetExtension(model.ComponentPinoutImage);
+                        component.ComponentPinoutImage = componentSaveName + extension;
+                        path = Path.Combine(uploads, component.ComponentPinoutImage);
+                        using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
                         {
                             await model.ComponentPinoutImageFile.CopyToAsync(fileStream);
+                            using (var thumbnailFileStream = new FileStream(Path.Combine(uploads, componentSaveName + "-254x254" + extension), FileMode.Create))
+                            {
+                                Image<Rgba32> image = Image.Load<Rgba32>(fileStream);
+                                image.Resize(new ResizeOptions { Mode = ResizeMode.Max, Size = new Size(254, 254) }).Save(thumbnailFileStream);
+                                image.Dispose();
+                            }
                         }
                     }
                 }
                 
 
 
-                _context.Add(component);
-                await _context.SaveChangesAsync();
+                _dbContext.Add(component);
+                await _dbContext.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
             return View(model);
@@ -192,7 +264,7 @@ namespace ElectroCircuitFriendRemake.Controllers
                 return NotFound();
             }
 
-            var component = await _context.Components.SingleOrDefaultAsync(m => m.Id == id);
+            var component = await _dbContext.Components.SingleOrDefaultAsync(m => m.Id == id);
             if (component == null)
             {
                 return NotFound();
@@ -216,8 +288,8 @@ namespace ElectroCircuitFriendRemake.Controllers
             {
                 try
                 {
-                    _context.Update(component);
-                    await _context.SaveChangesAsync();
+                    _dbContext.Update(component);
+                    await _dbContext.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -243,7 +315,7 @@ namespace ElectroCircuitFriendRemake.Controllers
                 return NotFound();
             }
 
-            var component = await _context.Components
+            var component = await _dbContext.Components
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (component == null)
             {
@@ -258,15 +330,15 @@ namespace ElectroCircuitFriendRemake.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var component = await _context.Components.SingleOrDefaultAsync(m => m.Id == id);
-            _context.Components.Remove(component);
-            await _context.SaveChangesAsync();
+            var component = await _dbContext.Components.SingleOrDefaultAsync(m => m.Id == id);
+            _dbContext.Components.Remove(component);
+            await _dbContext.SaveChangesAsync();
             return RedirectToAction("Index");
         }
 
         private bool ComponentExists(int id)
         {
-            return _context.Components.Any(e => e.Id == id);
+            return _dbContext.Components.Any(e => e.Id == id);
         }
     }
 }

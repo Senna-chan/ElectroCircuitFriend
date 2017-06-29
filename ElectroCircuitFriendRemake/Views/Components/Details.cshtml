@@ -1,5 +1,6 @@
 @model ElectroCircuitFriendRemake.Models.Component
-
+@using System.IO;
+@using ElectroCircuitFriendRemake.Models
 @{
     ViewData["Title"] = "Details";
 }
@@ -7,64 +8,71 @@
 <h2>Details</h2>
 
 <div>
-    <h4>Component</h4>
+    <div class="col-md-offset-5">
+        <h3>@Html.DisplayFor(model => model.Name)</h3>
+        <h4>@Html.DisplayFor(model => model.ComponentCategory)</h4>
+    </div>
+    <hr/>
+    <p>@Html.DisplayFor(model => model.Description)</p>
+    <p>@Html.DisplayFor(model => model.ExtraDescription)</p>
+    <hr/>
+    <div class="col-md-6">
+        <p class="label-info">@Html.DisplayNameFor(model => model.ComponentImage)</p>
+        @if (Model.ComponentImage != "" || Model.ComponentImage != null)
+        {
+            var imagelink = "/uploads/" + System.IO.Path.GetFileNameWithoutExtension(Model.ComponentImage) + "-254x254" + System.IO.Path.GetExtension(Model.ComponentImage);
+            <img src="@imagelink" alt="Component Image"/>
+        }
+    </div>
+    <div class="col-md-6">
+        <p class="label-info">@Html.DisplayNameFor(model => model.ComponentPinoutImage)</p>
+        @if (Model.ComponentPinoutImage != "" || Model.ComponentPinoutImage != null)
+        {
+            var imagelink = "/uploads/" + System.IO.Path.GetFileNameWithoutExtension(Model.ComponentPinoutImage) + "-254x254" + System.IO.Path.GetExtension(Model.ComponentPinoutImage);
+            <img src="@imagelink" alt="Component Image"/>
+        }
+    </div>
+    <a href="uploads/@Model.DataSheet">@Model.Name datasheet</a>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.ComponentCategory)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ComponentCategory)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ExtraDescription)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ExtraDescription)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ComponentImage)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ComponentImage)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.ComponentPinoutImage)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.ComponentPinoutImage)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.DataSheet)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.DataSheet)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.InStock)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.InStock)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Used)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Used)
-        </dd>
-    </dl>
+    <p>Component specific things</p>
+    @{
+        switch (Model.ComponentCategory)
+        {
+            case ComponentCategories.Misc:
+                break;
+            case ComponentCategories.Transistor:
+                break;
+            case ComponentCategories.PowerSupply:
+                break;
+            case ComponentCategories.Resistor:
+                await Html.RenderPartialAsync("Partials/Resistor", Model.Resistor);
+                break;
+            case ComponentCategories.Diode:
+                break;
+            case ComponentCategories.Led:
+                break;
+            case ComponentCategories.CeramicCap:
+                break;
+            case ComponentCategories.ElectrolyticCap:
+                break;
+            case ComponentCategories.Motor:
+                break;
+            case ComponentCategories.Servo:
+                break;
+            case ComponentCategories.Stepper:
+                break;
+            case ComponentCategories.Driver:
+                break;
+            case ComponentCategories.Microcontroller:
+                break;
+            case ComponentCategories.SingleBoardComputer:
+                break;
+            case ComponentCategories.Cables:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
