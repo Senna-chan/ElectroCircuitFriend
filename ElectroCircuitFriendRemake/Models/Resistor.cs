@@ -56,24 +56,5 @@
         public bool Use4Bands { get; set; }
         public bool Use5Bands { get; set; }
         public int Amount { get; set; }
-
-        public Resistor(int band1, int band2, int band3, int? band4, int? band5, int amount)
-        {
-            Band1 = band1;
-            Band2 = band2;
-            Band3 = band3;
-            Band4 = band4;
-            Band5 = band5;
-            Amount = amount;
-            if (band4 != null)
-            {
-                Use4Bands = true;
-            }
-            if (band5 != null)
-            {
-                Use5Bands = true;
-            }
-        }
-
     }
 }

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using ElectroCircuitFriendRemake.Helpers;
 using ElectroCircuitFriendRemake.Models;
 using Microsoft.AspNetCore.Http;
 
@@ -43,6 +45,7 @@ namespace ElectroCircuitFriendRemake.ViewModels
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var regex = new RegularExpressionAttribute(@"^(.*?(\.(png|jpg|gif|jpeg)\b)[^$]*)$");
             if (Used > InStock)
             {
                 yield return new ValidationResult(
@@ -66,6 +69,71 @@ namespace ElectroCircuitFriendRemake.ViewModels
                 yield return new ValidationResult(
                     "Text input is not the same as the file upload.</br>Did you wanted to change it to something else?",
                     new[] { "ComponentPinoutImage" });
+            }
+
+
+            if (DataSheet != null)
+            {
+                if (DataSheet.Contains("www.google."))
+                {
+                    var datasheetLink = DataSheet.GetQueryParam("url");
+                    if (datasheetLink.Contains(".pdf"))
+                    {
+                        DataSheet = datasheetLink;
+                    }
+                    else
+                    {
+                        yield return new ValidationResult(
+                            "The Google link that was parsed does not contain a valid pdf file",
+                            new[] {"DataSheet"});
+                    }
+                }
+                else if (!DataSheet.EndsWith(".pdf"))
+                {
+                    yield return new ValidationResult("Please upload a PDF file.", new[] { "DataSheet" });
+                }
+            }
+            if (ComponentPinoutImage != null)
+            {
+                if (ComponentPinoutImage.Contains("www.google."))
+                {
+                    var imagelink = ComponentPinoutImage.GetQueryParam("url");
+                    if (regex.IsValid(imagelink))
+                    {
+                        ComponentPinoutImage = imagelink;
+                    }
+                    else
+                    {
+                        yield return new ValidationResult(
+                            "The Google link that was parsed does not contain a valid image link",
+                            new[] {"ComponentPinoutImage"});
+                    }
+                }
+                else if(!regex.IsValid(ComponentPinoutImage))
+                {
+                    yield return new ValidationResult("The file is not a valid image file", new []{ "ComponentPinoutImage" });
+                }
+            }
+            if (ComponentImage != null)
+            {
+                if (ComponentImage.Contains("www.google."))
+                {
+                    var imagelink = ComponentImage.GetQueryParam("url");
+                    if (regex.IsValid(imagelink))
+                    {
+                        ComponentImage = imagelink;
+                    }
+                    else
+                    {
+                        yield return new ValidationResult(
+                            "The Google link that was parsed does not contain a valid image link",
+                            new[] { "ComponentImage" });
+                    }
+                }
+                else if (!regex.IsValid(ComponentImage))
+                {
+                    yield return new ValidationResult("The file is not a valid image file", new[] { "ComponentImage" });
+                }
             }
         }
     }

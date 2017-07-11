@@ -13,7 +13,17 @@ namespace ElectroCircuitFriendRemake.Data
             : base(options)
         {
         }
+
         public ApplicationDbContext() { }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(
+                "Server=(localdb)\\mssqllocaldb;Database=ElectroCircuitFriend;Trusted_Connection=True;MultipleActiveResultSets=true");
+            optionsBuilder.EnableSensitiveDataLogging();
+            base.OnConfiguring(optionsBuilder);
+        }
+
         public DbSet<Battery> Batteries { get; set; }
         public DbSet<Capacitor> Capacitors { get; set; }
         public DbSet<Component> Components { get; set; }

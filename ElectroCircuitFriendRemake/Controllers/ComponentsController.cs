@@ -24,10 +24,12 @@ namespace ElectroCircuitFriendRemake.Controllers
     {
         private readonly ApplicationDbContext _dbContext;
         private IHostingEnvironment _hostingEnvironment;
+        private string uploads;
         public ComponentsController(ApplicationDbContext dbContext, IHostingEnvironment environment)
         {
             _hostingEnvironment = environment;
             _dbContext = dbContext;    
+            uploads = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
         }
 
         // GET: Components
@@ -103,7 +105,6 @@ namespace ElectroCircuitFriendRemake.Controllers
                     Used = model.Used,
                     NormalizedString = componentSaveName
                 };
-                var uploads = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
                 
                 if (model.DataSheet != string.Empty)
                 {
@@ -140,17 +141,13 @@ namespace ElectroCircuitFriendRemake.Controllers
                     if (model.ComponentImage.StartsWith("http"))
                     {
                         extension = Path.GetExtension(await GetFileNameFromUrl(model.ComponentImage));
-                        component.ComponentImage = componentSaveName + extension;
-                        path = Path.Combine(uploads, component.ComponentImage);
+                        component.ComponentPinoutImage = componentSaveName + extension;
+                        path = Path.Combine(uploads, component.ComponentPinoutImage);
                         using (var httpClient = new HttpClient())
                         {
-                            if (model.ComponentPinoutImage.Contains("www.google."))
+                            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
                             {
-                                model.ComponentPinoutImage = model.ComponentPinoutImage.GetQueryParam("url");
-                            }
-                            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
-                            {
-                                var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentImage));
+                                var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentPinoutImage));
                                 downloadStream.CopyTo(fileStream);
                                 using (var thumbnailFileStream = new FileStream(Path.Combine(uploads,componentSaveName + "-254x254" + extension), FileMode.Create))
                                 {
@@ -166,7 +163,7 @@ namespace ElectroCircuitFriendRemake.Controllers
                         extension = Path.GetExtension(model.ComponentImage);
                         component.ComponentImage = componentSaveName + extension;
                         path = Path.Combine(uploads, component.ComponentImage);
-                        using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
+                        using (var fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
                         {
                             await model.ComponentImageFile.CopyToAsync(fileStream);
                             using (var thumbnailFileStream = new FileStream(Path.Combine(uploads, componentSaveName + "-254x254" + extension), FileMode.Create))
@@ -187,14 +184,14 @@ namespace ElectroCircuitFriendRemake.Controllers
                     {
                         if (model.ComponentPinoutImage.Contains("www.google."))
                         {
-                            model.ComponentPinoutImage = model.ComponentPinoutImage.GetQueryParam("imgurl");
+                            model.ComponentPinoutImage = model.ComponentPinoutImage.GetQueryParam("url");
                         }
                         extension = Path.GetExtension(await GetFileNameFromUrl(model.ComponentPinoutImage));
                         component.ComponentPinoutImage = componentSaveName + extension;
                         path = Path.Combine(uploads, component.ComponentPinoutImage);
                         using (var httpClient = new HttpClient())
                         {
-                            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
+                            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
                             {
                                 var downloadStream = await httpClient.GetStreamAsync(new Uri(model.ComponentPinoutImage));
                                 await downloadStream.CopyToAsync(fileStream);
@@ -212,7 +209,7 @@ namespace ElectroCircuitFriendRemake.Controllers
                         extension = Path.GetExtension(model.ComponentPinoutImage);
                         component.ComponentPinoutImage = componentSaveName + extension;
                         path = Path.Combine(uploads, component.ComponentPinoutImage);
-                        using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
+                        using (var fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
                         {
                             await model.ComponentPinoutImageFile.CopyToAsync(fileStream);
                             using (var thumbnailFileStream = new FileStream(Path.Combine(uploads, componentSaveName + "-254x254" + extension), FileMode.Create))
@@ -233,7 +230,6 @@ namespace ElectroCircuitFriendRemake.Controllers
             }
             return View(model);
         }
-
 
         private async Task<string> GetFileNameFromUrl(string url)
         {
